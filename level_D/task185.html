@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IT Project Dashboard</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>IT Project Dashboard</h1>
+    <p>Панель управления IT-проектами</p>
+
+    <section class="panel">
+      <h2>Добавить проект</h2>
+
+      <form id="projectForm">
+        <label for="name">Название проекта</label>
+        <input id="name" required placeholder="Например, AI Assistant">
+
+        <label for="direction">Направление</label>
+        <select id="direction">
+          <option value="Веб-разработка">Веб-разработка</option>
+          <option value="Искусственный интеллект">Искусственный интеллект</option>
+          <option value="Робототехника">Робототехника</option>
+          <option value="Мобильные приложения">Мобильные приложения</option>
+        </select>
+
+        <label for="responsible">Ответственный</label>
+        <input id="responsible" required placeholder="Имя студента">
+
+        <label for="progress">Прогресс, %</label>
+        <input id="progress" type="number" min="0" max="100"
+          value="0" required>
+
+        <button type="submit">Добавить проект</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Фильтрация</h2>
+      <label for="filter">Направление проекта</label>
+      <select id="filter">
+        <option value="Все">Все направления</option>
+        <option value="Веб-разработка">Веб-разработка</option>
+        <option value="Искусственный интеллект">Искусственный интеллект</option>
+        <option value="Робототехника">Робототехника</option>
+        <option value="Мобильные приложения">Мобильные приложения</option>
+      </select>
+
+      <h3 id="statistics"></h3>
+    </section>
+
+    <div id="projects" class="levels"></div>
+
+    <p><a href="index.html">Назад к заданиям</a></p>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "practice185Projects";
+
+    const initialProjects = [
+      {
+        id: 1,
+        name: "AI Assistant",
+        direction: "Искусственный интеллект",
+        responsible: "Алия",
+        progress: 75
+      },
+      {
+        id: 2,
+        name: "Student Portal",
+        direction: "Веб-разработка",
+        responsible: "Данияр",
+        progress: 40
+      },
+      {
+        id: 3,
+        name: "Smart Robot",
+        direction: "Робототехника",
+        responsible: "Асан",
+        progress: 100
+      }
+    ];
+
+    function loadProjects() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved === null) return initialProjects;
+        const data = JSON.parse(saved);
+        return Array.isArray(data) ? data : initialProjects;
+      } catch {
+        return initialProjects;
+      }
+    }
+
+    let projects = loadProjects();
+
+    function saveProjects() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+      } catch {
+        alert("Не удалось сохранить данные в браузере.");
+      }
+    }
+
+    function getStatus(progress) {
+      if (progress === 100) return "Завершён";
+      if (progress === 0) return "Планируется";
+      if (progress >= 80) return "На тестировании";
+      return "В разработке";
+    }
+
+    function render() {
+      const filter = document.getElementById("filter").value;
+      const container = document.getElementById("projects");
+
+      const visible = projects.filter(project =>
+        filter === "Все" || project.direction === filter
+      );
+
+      const average = projects.length
+        ? projects.reduce((sum, p) => sum + p.progress, 0) / projects.length
+        : 0;
+
+      document.getElementById("statistics").textContent =
+        `Всего проектов: ${projects.length}. ` +
+        `Средний прогресс: ${average.toFixed(1)}%.`;
+
+      container.replaceChildren();
+
+      if (visible.length === 0) {
+        container.textContent = "Проекты не найдены.";
+        return;
+      }
+
+      visible.forEach(project => {
+        const card = document.createElement("article");
+        card.className = "card";
+
+        const title = document.createElement("h3");
+        title.textContent = project.name;
+
+        const direction = document.createElement("p");
+        direction.textContent = `Направление: ${project.direction}`;
+
+        const responsible = document.createElement("p");
+        responsible.textContent = `Ответственный: ${project.responsible}`;
+
+        const status = document.createElement("p");
+        status.textContent = `Статус: ${getStatus(project.progress)}`;
+
+        const progressLabel = document.createElement("label");
+        progressLabel.textContent = `Прогресс: ${project.progress}%`;
+
+        const progress = document.createElement("progress");
+        progress.max = 100;
+        progress.value = project.progress;
+        progress.style.width = "100%";
+
+        const slider = document.createElement("input");
+        slider.type = "range";
+        slider.min = 0;
+        slider.max = 100;
+        slider.value = project.progress;
+        slider.setAttribute("aria-label", `Прогресс проекта ${project.name}`);
+        slider.style.width = "100%";
+
+        slider.addEventListener("input", () => {
+          project.progress = Number(slider.value);
+          progress.value = project.progress;
+          progressLabel.textContent = `Прогресс: ${project.progress}%`;
+          status.textContent = `Статус: ${getStatus(project.progress)}`;
+          saveProjects();
+          updateStatistics();
+        });
+
+        const remove = document.createElement("button");
+        remove.textContent = "Удалить проект";
+        remove.addEventListener("click", () => {
+          projects = projects.filter(p => p.id !== project.id);
+          saveProjects();
+          render();
+        });
+
+        card.append(
+          title, direction, responsible, status,
+          progressLabel, progress, slider, remove
+        );
+
+        container.append(card);
+      });
+    }
+
+    function updateStatistics() {
+      const average = projects.length
+        ? projects.reduce((sum, p) => sum + p.progress, 0) / projects.length
+        : 0;
+
+      document.getElementById("statistics").textContent =
+        `Всего проектов: ${projects.length}. ` +
+        `Средний прогресс: ${average.toFixed(1)}%.`;
+    }
+
+    document.getElementById("projectForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const direction = document.getElementById("direction").value;
+      const responsible = document.getElementById("responsible").value.trim();
+      const progress = Number(document.getElementById("progress").value);
+
+      if (!name || !responsible ||
+          !Number.isFinite(progress) || progress < 0 || progress > 100) {
+        alert("Проверьте заполнение полей и значение прогресса.");
+        return;
+      }
+
+      projects.push({
+        id: Date.now(),
+        name,
+        direction,
+        responsible,
+        progress
+      });
+
+      saveProjects();
+      event.target.reset();
+      document.getElementById("progress").value = 0;
+      render();
+    });
+
+    document.getElementById("filter").addEventListener("change", render);
+
+    render();
+  </script>
+</body>
+</html>

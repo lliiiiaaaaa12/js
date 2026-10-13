@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Каталог оборудования</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Каталог оборудования AI-центра</h1>
+
+    <label for="search">Поиск по названию</label>
+    <input id="search" placeholder="Введите название">
+
+    <label for="category">Категория</label>
+    <select id="category">
+      <option value="Все">Все категории</option>
+      <option value="Компьютеры">Компьютеры</option>
+      <option value="Периферия">Периферия</option>
+      <option value="Робототехника">Робототехника</option>
+    </select>
+
+    <h3 id="available"></h3>
+    <div id="catalog" class="levels"></div>
+    <a href="index.html">Назад к заданиям</a>
+  </main>
+
+  <script>
+    const equipment = [
+      { id: 1, name: "Компьютер Lenovo", category: "Компьютеры", available: true },
+      { id: 2, name: "Монитор Samsung", category: "Периферия", available: true },
+      { id: 3, name: "Робот Arduino", category: "Робототехника", available: true },
+      { id: 4, name: "Компьютер HP", category: "Компьютеры", available: false },
+      { id: 5, name: "Клавиатура", category: "Периферия", available: true }
+    ];
+
+    const catalog = document.getElementById("catalog");
+
+    function render() {
+      const search = document.getElementById("search").value.toLowerCase();
+      const category = document.getElementById("category").value;
+
+      const availableCount = equipment.filter(item => item.available).length;
+      document.getElementById("available").textContent =
+        `Доступно устройств: ${availableCount}`;
+
+      const filtered = equipment.filter(item =>
+        item.name.toLowerCase().includes(search) &&
+        (category === "Все" || item.category === category)
+      );
+
+      catalog.replaceChildren();
+
+      if (filtered.length === 0) {
+        catalog.textContent = "Устройства не найдены.";
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "card";
+
+        const title = document.createElement("h3");
+        title.textContent = item.name;
+
+        const type = document.createElement("p");
+        type.textContent = `Категория: ${item.category}`;
+
+        const status = document.createElement("p");
+        status.textContent = item.available ? "Доступно" : "Забронировано";
+
+        const button = document.createElement("button");
+        button.textContent = item.available ? "Забронировать" : "Освободить";
+        button.disabled = !item.available;
+
+        button.addEventListener("click", () => {
+          item.available = false;
+          render();
+        });
+
+        card.append(title, type, status, button);
+        catalog.append(card);
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", render);
+    document.getElementById("category").addEventListener("change", render);
+    render();
+  </script>
+</body>
+</html>

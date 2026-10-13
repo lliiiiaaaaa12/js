@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Электронный пропуск</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main class="container panel">
+    <h1>Электронный пропуск</h1>
+    <p>Проверка доступа в компьютерный кабинет</p>
+
+    <form id="accessForm">
+      <label for="studentId">ID студента</label>
+      <input id="studentId" required placeholder="Например, ST001">
+
+      <label for="group">Учебная группа</label>
+      <select id="group">
+        <option value="IT-101">IT-101</option>
+        <option value="IT-102">IT-102</option>
+        <option value="IT-103">IT-103</option>
+      </select>
+
+      <button type="submit">Проверить доступ</button>
+    </form>
+
+    <h2 id="result">Ожидание проверки</h2>
+    <p id="checkTime"></p>
+    <a href="index.html">Назад к заданиям</a>
+  </main>
+
+  <script>
+    const students = [
+      { id: "ST001", group: "IT-101" },
+      { id: "ST002", group: "IT-102" },
+      { id: "ST003", group: "IT-103" }
+    ];
+
+    document.getElementById("accessForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const id = document.getElementById("studentId").value.trim().toUpperCase();
+      const group = document.getElementById("group").value;
+
+      const allowed = students.some(student =>
+        student.id === id && student.group === group
+      );
+
+      const result = document.getElementById("result");
+      result.textContent = allowed
+        ? "Доступ разрешён"
+        : "Доступ запрещён";
+
+      result.style.color = allowed ? "green" : "red";
+
+      document.getElementById("checkTime").textContent =
+        "Время проверки: " + new Date().toLocaleString("ru-RU");
+    });
+  </script>
+</body>
+</html>

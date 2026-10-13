@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Калькулятор оценки</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main class="container panel">
+    <h1>Калькулятор оценки за семестр</h1>
+
+    <form id="gradeForm">
+      <label for="practice">Практические работы (40%)</label>
+      <input id="practice" type="number" min="0" max="100"
+        required value="80">
+
+      <label for="independent">Самостоятельные задания (20%)</label>
+      <input id="independent" type="number" min="0" max="100"
+        required value="90">
+
+      <label for="exam">Экзамен (40%)</label>
+      <input id="exam" type="number" min="0" max="100"
+        required value="85">
+
+      <button type="submit">Рассчитать</button>
+      <button type="reset">Очистить</button>
+    </form>
+
+    <h2 id="result">Введите баллы</h2>
+    <a href="index.html">Назад к заданиям</a>
+  </main>
+
+  <script>
+    const form = document.getElementById("gradeForm");
+    const result = document.getElementById("result");
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+
+      const practice = Number(document.getElementById("practice").value);
+      const independent = Number(document.getElementById("independent").value);
+      const exam = Number(document.getElementById("exam").value);
+
+      const scores = [practice, independent, exam];
+
+      if (scores.some(score => !Number.isFinite(score) || score < 0 || score > 100)) {
+        result.textContent = "Ошибка: каждый балл должен быть от 0 до 100.";
+        return;
+      }
+
+      const total = practice * 0.4 + independent * 0.2 + exam * 0.4;
+
+      let category;
+      if (total >= 90) category = "Отлично";
+      else if (total >= 75) category = "Хорошо";
+      else if (total >= 50) category = "Удовлетворительно";
+      else category = "Неудовлетворительно";
+
+      result.textContent =
+        `Итоговый балл: ${total.toFixed(2)} из 100. Оценка: ${category}`;
+    });
+
+    form.addEventListener("reset", () => {
+      result.textContent = "Введите баллы";
+    });
+  </script>
+</body>
+</html>

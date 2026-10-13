@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Генератор заданий</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <main class="container panel">
+    <h1>Генератор индивидуальных заданий</h1>
+
+    <label for="student">Имя студента</label>
+    <input id="student" placeholder="Введите имя" required>
+
+    <label for="level">Уровень сложности</label>
+    <select id="level">
+      <option value="A">A — лёгкий</option>
+      <option value="B">B — средний</option>
+      <option value="C">C — сложный</option>
+    </select>
+
+    <button id="generate">Выдать задание</button>
+    <button id="reset">Начать заново</button>
+
+    <section id="result" class="panel">
+      Здесь появится назначенное задание.
+    </section>
+
+    <a href="index.html">Назад к заданиям</a>
+  </main>
+
+  <script>
+    const tasks = [
+      { id: 161, name: "Проверка возраста", level: "A" },
+      { id: 162, name: "Свободные компьютеры", level: "A" },
+      { id: 163, name: "Уровень знаний", level: "A" },
+      { id: 164, name: "Проверка доставки", level: "A" },
+      { id: 165, name: "Время выполнения теста", level: "A" },
+
+      { id: 166, name: "Анализ посещаемости", level: "B" },
+      { id: 167, name: "Обратный порядок чисел", level: "B" },
+      { id: 168, name: "Стоимость оборудования", level: "B" },
+      { id: 169, name: "Числа, кратные четырём", level: "B" },
+      { id: 170, name: "Длина слов", level: "B" },
+
+      { id: 174, name: "Расчёт аренды", level: "C" },
+      { id: 175, name: "Статус проекта", level: "C" },
+      { id: 176, name: "Генератор сертификатов", level: "C" },
+      { id: 177, name: "Рейтинг команд", level: "C" },
+      { id: 178, name: "Расход пластика", level: "C" }
+    ];
+
+    const used = { A: [], B: [], C: [] };
+
+    const studentInput = document.getElementById("student");
+    const levelInput = document.getElementById("level");
+    const result = document.getElementById("result");
+
+    document.getElementById("generate").addEventListener("click", () => {
+      const student = studentInput.value.trim();
+      const level = levelInput.value;
+
+      if (!student) {
+        result.textContent = "Введите имя студента.";
+        studentInput.focus();
+        return;
+      }
+
+      const available = tasks.filter(task =>
+        task.level === level && !used[level].includes(task.id)
+      );
+
+      if (available.length === 0) {
+        result.textContent =
+          "Все задания этого уровня уже выданы. Нажмите «Начать заново».";
+        return;
+      }
+
+      const index = Math.floor(Math.random() * available.length);
+      const task = available[index];
+
+      used[level].push(task.id);
+
+      result.textContent =
+        `Студент: ${student}\n` +
+        `Уровень: ${level}\n` +
+        `Задание № ${task.id}: ${task.name}\n` +
+        `Осталось заданий этого уровня: ${available.length - 1}`;
+    });
+
+    document.getElementById("reset").addEventListener("click", () => {
+      used.A.length = 0;
+      used.B.length = 0;
+      used.C.length = 0;
+      result.textContent = "Список выданных заданий очищен.";
+    });
+  </script>
+</body>
+</html>

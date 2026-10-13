@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Practice 161–185</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>JavaScript Practice 161–185</h1>
+    <p>Практические задания по JavaScript</p>
+  </header>
+
+  <main class="container">
+    <h2>Выберите уровень сложности</h2>
+
+    <div class="levels">
+      <a class="card" href="level_A/index.html">
+        <h2>Уровень A</h2>
+        <p>Условные операторы</p>
+        <p>Задания 161–165</p>
+      </a>
+
+      <a class="card" href="level_B/index.html">
+        <h2>Уровень B</h2>
+        <p>Циклы и массивы</p>
+        <p>Задания 166–173</p>
+      </a>
+
+      <a class="card" href="level_C/index.html">
+        <h2>Уровень C</h2>
+        <p>Функции и объекты</p>
+        <p>Задания 174–180</p>
+      </a>
+
+      <a class="card" href="level_D/index.html">
+        <h2>Уровень D</h2>
+        <p>Веб-приложения</p>
+        <p>Задания 181–185</p>
+      </a>
+    </div>
+
+    <section class="panel">
+      <h2>Случайное задание</h2>
+      <label for="level">Уровень:</label>
+      <select id="level">
+        <option value="A">A — лёгкий</option>
+        <option value="B">B — средний</option>
+        <option value="C">C — сложный</option>
+        <option value="D">D — веб-приложения</option>
+      </select>
+
+      <button id="randomBtn">Выбрать задание</button>
+      <p id="result">Здесь появится назначенное задание.</p>
+    </section>
+  </main>
+
+  <script>
+    const tasks = {
+      A: [161, 162, 163, 164, 165],
+      B: [166, 167, 168, 169, 170, 171, 172, 173],
+      C: [174, 175, 176, 177, 178, 179, 180],
+      D: [181, 182, 183, 184, 185]
+    };
+
+    document.getElementById("randomBtn").addEventListener("click", () => {
+      const level = document.getElementById("level").value;
+      const list = tasks[level];
+      const task = list[Math.floor(Math.random() * list.length)];
+
+      document.getElementById("result").textContent =
+        `Вам назначено задание № ${task}, уровень ${level}.`;
+    });
+  </script>
+</body>
+</html>
